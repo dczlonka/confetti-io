@@ -1,0 +1,8 @@
+Library
+Temp
+*.apk
+Assembly-CSharp-Editor.csproj
+Assembly-CSharp-firstpass.csproj
+Assembly-CSharp.csproj
+*.userprefs
+*.sln
