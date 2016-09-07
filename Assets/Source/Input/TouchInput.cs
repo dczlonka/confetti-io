@@ -3,7 +3,8 @@ using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using System.Collections;
 
-public class TouchInput : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDragHandler
+[RequireComponent (typeof (Image))]
+public class TouchInput : AbstractInput, IPointerDownHandler, IPointerUpHandler, IDragHandler
 {
     [SerializeField]
     private RectTransform joystickBackground;
@@ -15,16 +16,31 @@ public class TouchInput : MonoBehaviour, IPointerDownHandler, IPointerUpHandler,
     private bool isJoystickActive;
     private Vector2 touchStart;
     private float joystickMaxDistance;
+    private bool isActive;
 
-    void Start()
+    public override void Init()
     {
-        HideJoystick();
-
         // Calculate distance using world background corner positions. It should look same witch any resolution.
         Vector3[] corners = new Vector3[4];
         joystickBackground.GetWorldCorners(corners);
         float worldWidth = corners[2].x - corners[0].x;
         joystickMaxDistance = worldWidth / 2;
+
+        Disable();
+    }
+
+    public override void Enable ()
+    {
+        isActive = true;
+        transform.parent.gameObject.SetActive(true);
+        HideJoystick();
+    }
+
+    public override void Disable ()
+    {
+        isActive = false;
+        transform.parent.gameObject.SetActive(false);
+        SetAxisValue(Vector3.zero);
     }
 
     public void OnPointerDown (PointerEventData eventData)
@@ -53,7 +69,7 @@ public class TouchInput : MonoBehaviour, IPointerDownHandler, IPointerUpHandler,
         if (isJoystickActive == true && joystickFingerId == eventData.pointerId)
         {
             Vector2 dir = eventData.position - touchStart;
-            if (dir.magnitude > GameInput.INPUT_DEAD_ZONE)
+            if (dir.magnitude > INPUT_DEAD_ZONE)
             {
                 SetAxisValue(dir.normalized);
             }
@@ -64,11 +80,6 @@ public class TouchInput : MonoBehaviour, IPointerDownHandler, IPointerUpHandler,
 
             UpdateJoystickPosition(eventData.position);
         }
-    }
-
-    private void SetAxisValue(Vector2 axis)
-    {
-        GameInput.Axis = axis;
     }
 
     private void ShowJoystick(Vector2 start)
