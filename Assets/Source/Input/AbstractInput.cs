@@ -14,6 +14,11 @@ public abstract class AbstractInput : MonoBehaviour
         Init();
     }
 
+    protected void OnSplitClicked()
+    {
+        GameInput.Instance.OnSplitClicked();
+    }
+
     protected void SetAxisValue(Vector2 axis)
     {
         GameInput.Axis = axis;

@@ -12,6 +12,9 @@ public class TouchInput : AbstractInput, IPointerDownHandler, IPointerUpHandler,
     [SerializeField]
     private RectTransform joystick;
 
+    [SerializeField]
+    private Button splitButton;
+
     private int joystickFingerId;
     private bool isJoystickActive;
     private Vector2 touchStart;
@@ -26,6 +29,7 @@ public class TouchInput : AbstractInput, IPointerDownHandler, IPointerUpHandler,
         float worldWidth = corners[2].x - corners[0].x;
         joystickMaxDistance = worldWidth / 2;
 
+        splitButton.onClick.AddListener(OnSplitClicked);
         Disable();
     }
 

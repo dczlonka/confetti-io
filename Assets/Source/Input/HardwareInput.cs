@@ -32,6 +32,11 @@ public class HardwareInput : AbstractInput
         if (!isActive)
             return;
 
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            OnSplitClicked();
+        }
+
         Vector3 dir = Input.mousePosition - screenCenter;
         if (dir.magnitude > INPUT_DEAD_ZONE)
         {
