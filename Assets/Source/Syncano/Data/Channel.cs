@@ -4,7 +4,7 @@ using Syncano;
 using Syncano.Enum;
 
 [System.Serializable]
-public class Channel : SyncanoObject<Channel>{
+public class Channel : SyncanoObject {
 
 	/// <summary>
 	/// Channel name.

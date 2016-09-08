@@ -10,7 +10,7 @@ namespace Syncano {
 /// Class representing basic data structure for all DataObjects returned from Syncano. Every class must override it, otherwise it won't deserialize properly.
 /// </summary>
 [System.Serializable]
-public class SyncanoObject<T> : JsonData<T> {
+public class SyncanoObject {
 
 	/// <summary>
 	/// Empty constructor is required when deserializing Syncano objects.
@@ -22,5 +22,14 @@ public class SyncanoObject<T> : JsonData<T> {
 	/// </summary>
 	public long id;
 
+	/// <summary>
+	/// The channel.
+	/// </summary>
+	public string channel;
+
+	/// <summary>
+	/// Channel room.
+	/// </summary>
+	public string channelRoom;
 }
 }

@@ -4,7 +4,7 @@ using Syncano;
 using System.Xml;
 
 [System.Serializable]
-public class Notification : SyncanoObject<Notification> {
+public class Notification : SyncanoObject {
 
 	/// <summary>
 	/// The payload.
