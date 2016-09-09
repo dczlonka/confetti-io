@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Syncano.Data;
 
-public class GameState : MonoBehaviour
+public class GameState : Singleton<GameState>
 {
     private RoomData room;
     private PlayerData myPlayer;
