@@ -129,7 +129,7 @@ namespace Syncano.Client {
 			string id =  (obj != null && obj.id != 0) ? obj.id.ToString() : string.Empty;
 			string url = UrlBuilder(id.ToString(), typeof(T));
 
-			return StartCoroutine(SendRequest(url, serializedObject, onSuccess, onFailure, httpMethodOverride));
+			return StartCoroutine(SendRequest(new Response<T>(), url, serializedObject, onSuccess, onFailure, httpMethodOverride));
 		}
 
 		/// <summary>
@@ -145,67 +145,65 @@ namespace Syncano.Client {
 
 			string url = UrlBuilder(id.ToString(), typeof(T));
 
-			return StartCoroutine(SendRequest(url, string.Empty, onSuccess, onFailure, httpMethodOverride));
+			return StartCoroutine(SendRequest(new Response<T>(), url, string.Empty, onSuccess, onFailure, httpMethodOverride));
 		}
 
 		public Coroutine PostAsync<T>(Dictionary<string, string> postData, Action<Response<T>> onSuccess, Action<Response<T>> onFailure = null, string httpMethodOverride = null) where T : SyncanoObject, new() {
 
 			string url = UrlBuilder(string.Empty, typeof(T));
 
-			return StartCoroutine(SendRequest(url, string.Empty, onSuccess, onFailure, httpMethodOverride));
+			return StartCoroutine(SendRequest(new Response<T>(), url, string.Empty, onSuccess, onFailure, httpMethodOverride));
 		}
 
 		public Coroutine GetAsync<T>(string channelName, Dictionary<string, string> getData, Action<Response<T>> onSuccess, Action<Response<T>> onFailure = null) where T : SyncanoObject, new() {
 
 			string url = UrlBuilder(channelName, typeof(T), getData);
 
-			return StartCoroutine(SendRequest(url, string.Empty, onSuccess, onFailure, UnityWebRequest.kHttpVerbGET));
+			return StartCoroutine(SendRequest(new Response<T>(), url, string.Empty, onSuccess, onFailure, UnityWebRequest.kHttpVerbGET));
 		}
 
-		/* public Coroutine PostAsync<T>(Action<ResponseGetList<T>> onSuccess, Action<ResponseGetList<T>> onFailure = null, string httpMethodOverride = null) where T : SyncanoObject, new() {
-		string url = UrlBuilder(null, typeof(T));
-		return StartCoroutine(SendRequest<T>(url, string.Empty, onSuccess, onFailure, httpMethodOverride));
-	}
-	private IEnumerator SendRequest<T>(string url, string serializedObject, Action<ResponseGetList<T>> onSuccess, Action<ResponseGetList<T>> onFailure = null, string httpMethodOverride = null) {
-			yield return null;
-	}*/
+	 	public Coroutine PostAsync<T>(Action<ResponseGetList<T>> onSuccess, Action<ResponseGetList<T>> onFailure = null, string httpMethodOverride = null) where T : SyncanoObject, new() {
+			string url = UrlBuilder(null, typeof(T));
+			return StartCoroutine(SendRequest<T>(new ResponseGetList<T>(), url, string.Empty, onSuccess, onFailure, httpMethodOverride));
+		}
 
 		/// <summary>
-		/// Sends the request to Syncano. Used for all methods like Save, Delete, Create etc.
+		/// Sends the request.
 		/// </summary>
 		/// <returns>The request.</returns>
+		/// <param name="response">Response.</param>
 		/// <param name="url">URL.</param>
 		/// <param name="serializedObject">Serialized object.</param>
 		/// <param name="onSuccess">On success.</param>
 		/// <param name="onFailure">On failure.</param>
 		/// <param name="httpMethodOverride">Http method override.</param>
 		/// <typeparam name="T">The 1st type parameter.</typeparam>
-		private IEnumerator SendRequest<T>(string url, string serializedObject, Action<Response<T>> onSuccess, Action<Response<T>> onFailure = null, string httpMethodOverride = null)  {
-
-			UnityWebRequest www = new UnityWebRequest(url);
-			www.SetRequestHeader(Constants.HTTP_HEADER_API_KEY, SyncanoClient.Instance.ApiKey);
-			www.SetRequestHeader("Content-Type", "application/json");
-			UTF8Encoding encoding = new UTF8Encoding();
-
-			www.downloadHandler = new DownloadHandlerBuffer();
-
-			www.method = string.IsNullOrEmpty(httpMethodOverride) ? UnityWebRequest.kHttpVerbPOST : httpMethodOverride;
-
-			if(string.IsNullOrEmpty(serializedObject) == false)
-			{
-				www.uploadHandler = new UploadHandlerRaw(encoding.GetBytes(serializedObject));
-			}
+		private IEnumerator SendRequest<T>(Response<T> response, string url, string serializedObject, Delegate onSuccess, Delegate onFailure = null, string httpMethodOverride = null)  where T : SyncanoObject, new() {
+			
+			UnityWebRequest www = PrepareWebRequest(url, serializedObject, httpMethodOverride);
 
 			yield return www.Send();
 
-			Response<T> response = new Response<T>();
-			ReadWebRequest<Response<T>>(response, www);
+			ReadWebRequest(response, www);
+			ProcessResponse(response, onSuccess, onFailure, www.method, www.downloadHandler.text);
+		}
 
+		/// <summary>
+		/// After request was received, check and call available callbacks.
+		/// </summary>
+		/// <param name="response">Response.</param>
+		/// <param name="onSuccess">On success.</param>
+		/// <param name="onFailure">On failure.</param>
+		/// <param name="method">Method.</param>
+		/// <param name="json">Json.</param>
+		/// <typeparam name="T">The 1st type parameter.</typeparam>
+		private void ProcessResponse<T> (Response<T> response, Delegate onSuccess, Delegate onFailure, string method, string json) where T : SyncanoObject, new()
+		{
 			if(response.IsSuccess == false)
 			{
 				if(onFailure != null)
 				{
-					onFailure(response);
+					onFailure.DynamicInvoke(response);
 				}
 			}
 
@@ -213,13 +211,11 @@ namespace Syncano.Client {
 			{
 				if(onSuccess != null)
 				{
-					if(www.method.Equals(UnityWebRequest.kHttpVerbDELETE) == false)
+					if(method.Equals(UnityWebRequest.kHttpVerbDELETE) == false)
 					{
-						//response.Data = SyncanoObject.FromJson(www.downloadHandler.text);
-
-						response.Data = JsonUtility.FromJson<T>(www.downloadHandler.text);
+						response.SetData(json);
 					}
-					onSuccess(response);
+					onSuccess.DynamicInvoke(response);
 				}
 			}
 		}
@@ -250,9 +246,35 @@ namespace Syncano.Client {
 			yield return www.Send();
 
 			ScriptEndpoint response = JsonUtility.FromJson<ScriptEndpoint>(www.downloadHandler.text);
-			ReadWebRequest<ScriptEndpoint>(response, www);
+			ReadWebRequest(response, www);
 
 			callback(response);
+		}
+
+		/// <summary>
+		/// Prepares the web request to be sent to Syncano.
+		/// </summary>
+		/// <returns>The web request.</returns>
+		/// <param name="url">URL.</param>
+		/// <param name="serializedObject">Serialized object.</param>
+		/// <param name="httpMethodOverride">Http method override.</param>
+		private UnityWebRequest PrepareWebRequest(string url, string serializedObject, string httpMethodOverride = null)
+		{
+			UnityWebRequest www = new UnityWebRequest(url);
+			www.SetRequestHeader(Constants.HTTP_HEADER_API_KEY, SyncanoClient.Instance.ApiKey);
+			www.SetRequestHeader("Content-Type", "application/json");
+			UTF8Encoding encoding = new UTF8Encoding();
+
+			www.downloadHandler = new DownloadHandlerBuffer();
+
+			www.method = string.IsNullOrEmpty(httpMethodOverride) ? UnityWebRequest.kHttpVerbPOST : httpMethodOverride;
+
+			if(string.IsNullOrEmpty(serializedObject) == false)
+			{
+				www.uploadHandler = new UploadHandlerRaw(encoding.GetBytes(serializedObject));
+			}
+
+			return www;
 		}
 
 		/// <summary>
@@ -261,7 +283,7 @@ namespace Syncano.Client {
 		/// <param name="webRequest">Web request.</param>
 		/// <param name="www">Www.</param>
 		/// <typeparam name="T">The 1st type parameter.</typeparam>
-		private void ReadWebRequest<T>(SyncanoWebRequest webRequest, UnityWebRequest www) {
+		private void ReadWebRequest(SyncanoWebRequest webRequest, UnityWebRequest www) {
 
 			webRequest.responseCode = www.responseCode;
 			webRequest.webError = www.error;
