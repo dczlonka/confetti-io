@@ -17,9 +17,4 @@ public class PlayerData : SyncanoObject
     /// Inactive player and his cells should not take place in game.
     /// </summary>
     public bool isAlive;
-
-    /// <summary>
-    /// Collection of cells that belong to this player.
-    /// </summary>
-    public CellData[] cells;
 }

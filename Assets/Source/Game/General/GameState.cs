@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using Syncano.Data;
 
 public class GameState : MonoBehaviour
 {
@@ -48,15 +49,16 @@ public class GameState : MonoBehaviour
         if (myPlayer == null)
         {
             StopGame();
-            throw new UnityException("Trying to start but my player is missing!");
+            throw new UnityException("Trying to start but player is missing!");
         }
 
 
         isRunning = true;
-        syncLoop = StartCoroutine(UpdateLoop());
+        syncLoop = StartCoroutine(SyncLoop());
+        GetCells();
     }
 
-    private IEnumerator UpdateLoop()
+    private IEnumerator SyncLoop()
     {
         while (isRunning)
         {
@@ -94,6 +96,8 @@ public class GameState : MonoBehaviour
         }
     }
 
+    //--------------------------- Send my cells ---------------------------//
+
     public Coroutine SendMyCellPositions()
     {
         return StartCoroutine(SendCellPositions(myCells));
@@ -105,5 +109,30 @@ public class GameState : MonoBehaviour
         {
             yield return SyncanoWrapper.Please().Save(item, null);
         }
+    }
+
+    //--------------------------- Get cells ---------------------------//
+
+    private void GetCells()
+    {
+        SyncanoWrapper.Please().Get<CellData>(OnCellsDownloaded);
+    }
+
+    private void OnCellsDownloaded(ResponseGetList<CellData> response)
+    {
+        if (!isRunning)
+            return;
+
+        if (response.IsSuccess)
+            MergeCells(response.objects);
+
+
+        GetCells(); // Try update again.
+    }
+
+    private void MergeCells(List<CellData> cells)
+    {
+        room.cells.Clear();
+        room.cells = cells;
     }
 }
