@@ -123,7 +123,7 @@ namespace Syncano.Client {
 		/// <param name="onFailure">On failure.</param>
 		/// <param name="httpMethodOverride">Http method override.</param>
 		/// <typeparam name="T">The 1st type parameter.</typeparam>
-		public Coroutine PostAsync<T>(T obj, Action<Response<T>> onSuccess, Action<Response<T>> onFailure = null, string httpMethodOverride = null) where T :SyncanoObject , new() {
+		public Coroutine PostAsync<T>(T obj, Action<Response<T>> onSuccess, Action<Response<T>> onFailure, string httpMethodOverride = null) where T :SyncanoObject , new() {
 
 			string serializedObject = obj != null ? JsonUtility.ToJson(obj) : string.Empty;
 			string id =  (obj != null && obj.id != 0) ? obj.id.ToString() : string.Empty;
@@ -141,21 +141,21 @@ namespace Syncano.Client {
 		/// <param name="onFailure">On failure.</param>
 		/// <param name="httpMethodOverride">Http method override.</param>
 		/// <typeparam name="T">The 1st type parameter.</typeparam>
-		public Coroutine PostAsync<T>(long id, Action<Response<T>> onSuccess, Action<Response<T>> onFailure = null, string httpMethodOverride = null) where T : SyncanoObject, new() {
+		public Coroutine PostAsync<T>(long id, Action<Response<T>> onSuccess, Action<Response<T>> onFailure, string httpMethodOverride = null) where T : SyncanoObject, new() {
 
 			string url = UrlBuilder(id.ToString(), typeof(T));
 
 			return StartCoroutine(SendRequest(new Response<T>(), url, string.Empty, onSuccess, onFailure, httpMethodOverride));
 		}
 
-		public Coroutine PostAsync<T>(Dictionary<string, string> postData, Action<Response<T>> onSuccess, Action<Response<T>> onFailure = null, string httpMethodOverride = null) where T : SyncanoObject, new() {
+		public Coroutine PostAsync<T>(Dictionary<string, string> postData, Action<Response<T>> onSuccess, Action<Response<T>> onFailure, string httpMethodOverride = null) where T : SyncanoObject, new() {
 
 			string url = UrlBuilder(string.Empty, typeof(T));
 
 			return StartCoroutine(SendRequest(new Response<T>(), url, string.Empty, onSuccess, onFailure, httpMethodOverride));
 		}
 
-		public Coroutine GetAsync<T>(string channelName, Dictionary<string, string> getData, Action<Response<T>> onSuccess, Action<Response<T>> onFailure = null) where T : SyncanoObject, new() {
+		public Coroutine GetAsync<T>(string channelName, Dictionary<string, string> getData, Action<Response<T>> onSuccess, Action<Response<T>> onFailure) where T : SyncanoObject, new() {
 
 			string url = UrlBuilder(channelName, typeof(T), getData);
 
@@ -178,7 +178,7 @@ namespace Syncano.Client {
 		/// <param name="onFailure">On failure.</param>
 		/// <param name="httpMethodOverride">Http method override.</param>
 		/// <typeparam name="T">The 1st type parameter.</typeparam>
-		private IEnumerator SendRequest<T>(Response<T> response, string url, string serializedObject, Delegate onSuccess, Delegate onFailure = null, string httpMethodOverride = null)  where T : SyncanoObject, new() {
+		private IEnumerator SendRequest<T>(Response<T> response, string url, string serializedObject, Delegate onSuccess, Delegate onFailure, string httpMethodOverride = null)  where T : SyncanoObject, new() {
 			
 			UnityWebRequest www = PrepareWebRequest(url, serializedObject, httpMethodOverride);
 
@@ -197,26 +197,39 @@ namespace Syncano.Client {
 		/// <param name="method">Method.</param>
 		/// <param name="json">Json.</param>
 		/// <typeparam name="T">The 1st type parameter.</typeparam>
-		private void ProcessResponse<T> (Response<T> response, Delegate onSuccess, Delegate onFailure, string method, string json) where T : SyncanoObject, new()
+		private void ProcessResponse<T>(Response<T> response, Delegate onSuccess, Delegate onFailure, string method, string json) where T : SyncanoObject, new()
 		{
-			if(response.IsSuccess == false)
+			if(onFailure != null)
 			{
-				if(onFailure != null)
+				if(response.IsSuccess == false)
 				{
-					onFailure.DynamicInvoke(response);
+					if(onFailure != null)
+					{
+						onFailure.DynamicInvoke(response);
+					}
+				}
+
+				else
+				{
+					if(onSuccess != null)
+					{
+						if(method.Equals(UnityWebRequest.kHttpVerbDELETE) == false)
+						{
+							response.SetData(json);
+						}
+						onSuccess.DynamicInvoke(response);
+					}
 				}
 			}
 
 			else
 			{
-				if(onSuccess != null)
+				if(method.Equals(UnityWebRequest.kHttpVerbDELETE) == false)
 				{
-					if(method.Equals(UnityWebRequest.kHttpVerbDELETE) == false)
-					{
-						response.SetData(json);
-					}
-					onSuccess.DynamicInvoke(response);
+					response.SetData(json);
 				}
+
+				onSuccess.DynamicInvoke(response);
 			}
 		}
 
