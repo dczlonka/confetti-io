@@ -77,7 +77,7 @@ public class Communication
             return;
 
         if (response.IsSuccess)
-            controller.MergeCells(response.objects);
+            controller.UpdateCells(response.objects);
 
 
         GetCells(); // Try update again.

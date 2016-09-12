@@ -31,7 +31,7 @@ public class GameController : Singleton<GameController>
         communication.StopSyncLoop();
     }
 
-    public void MergeCells(List<CellData> cells)
+    public void UpdateCells(List<CellData> cells)
     {
         GameModel.room.cells.Clear();
         GameModel.room.cells = cells;
