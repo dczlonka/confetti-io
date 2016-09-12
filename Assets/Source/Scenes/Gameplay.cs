@@ -4,11 +4,11 @@ using Syncano.Data;
 
 public class Gameplay : MonoBehaviour
 {
-    private GameState gameState;
+    private GameController controller;
 
     void Start()
     {
-        gameState = GameState.Instance;
+        controller = GameController.Instance;
         GetRoom();
     }
 
