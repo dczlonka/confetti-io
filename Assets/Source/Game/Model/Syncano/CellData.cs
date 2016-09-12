@@ -7,6 +7,11 @@ using System.Collections;
 [System.Serializable]
 public class CellData : EntityData
 {
+    public override string ViewResource
+    {
+        get { return base.ViewResource + "CellView"; }
+    }
+
     /// <summary>
     /// Identifier of the owner Player..
     /// </summary>

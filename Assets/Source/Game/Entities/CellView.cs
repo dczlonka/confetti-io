@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class PlayerAvatar : MonoBehaviour
+public class CellView : EntityView
 {
     public const float MAX_SPEED = 2.5f;
     public const float ACCELERATION = 5f;

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 
 public class GameController : Singleton<GameController>
 {
+    public GameView GameView { get; private set; }
     public GameModel GameModel { get; private set; }
     private Communication communication;
 
@@ -22,6 +23,9 @@ public class GameController : Singleton<GameController>
         }
 
         GameModel = new GameModel(room, myPlayer);
+        GameView = GetComponent<GameView>();
+        GameView.CreateViews(GameModel.room.cells);
+
         communication = new Communication(this);
         communication.StartSyncLoop();
     }
@@ -35,5 +39,6 @@ public class GameController : Singleton<GameController>
     {
         GameModel.room.cells.Clear();
         GameModel.room.cells = cells;
+        GameView.UpdateViews(cells);
     }
 }
