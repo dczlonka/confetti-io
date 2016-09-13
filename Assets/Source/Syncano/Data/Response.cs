@@ -16,7 +16,7 @@ namespace Syncano.Data {
 
 		public virtual void SetData(string json)
 		{
-			Data = JsonUtility.FromJson<T>(json);
+			Data = Newtonsoft.Json.JsonConvert.DeserializeObject<T>(json);
 		}
 }
 }

@@ -131,8 +131,8 @@ namespace Syncano.Request {
 		/// <param name="endpointId">Endpoint identifier.</param>
 		/// <param name="scriptName">Script name.</param>
 		/// <param name="callback">Callback.</param>
-		public Coroutine CallScriptEndpoint(string endpointId, string scriptName, Action<ScriptEndpoint> callback) {
-			return SyncanoHttpClient.Instance.CallScriptEndpoint(endpointId, scriptName, callback);
+		public Coroutine CallScriptEndpoint(string endpointId, string scriptName, Action<ScriptEndpoint> callback, Dictionary<string, string> payload = null) {
+			return SyncanoHttpClient.Instance.CallScriptEndpoint(endpointId, scriptName, callback, payload);
 		}
 
 		private void CheckCallbacks<T>(Delegate onSuccess, Delegate onFailure) where T : SyncanoObject, new()
