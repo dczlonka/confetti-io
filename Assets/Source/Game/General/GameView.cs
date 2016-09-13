@@ -18,6 +18,12 @@ public class GameView : MonoBehaviour
     {
         EntityView view = data.CreateView();
         cellViews.Add(data.id, view as CellView);
+
+        CellData mainCell = GameController.Instance.GameModel.MainCell;
+        if (mainCell != null && data.id == mainCell.id)
+        {
+            FollowTarget(view.transform);
+        }
     }
 
     public void UpdateViews(List<CellData> cells)
@@ -51,5 +57,11 @@ public class GameView : MonoBehaviour
                 Destroy(view);
             }
         }
+    }
+
+    private void FollowTarget(Transform target)
+    {
+        CameraFollowTarget follow = Camera.main.GetComponent<CameraFollowTarget>();
+        follow.SetTarget(target, false);
     }
 }
