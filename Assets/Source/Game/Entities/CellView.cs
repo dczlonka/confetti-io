@@ -9,7 +9,7 @@ public class CellView : EntityView
     private CellData CellData { get { return Data as CellData; } }
     private Rigidbody2D rigid;
     private float speed = 0;
-    private long playerId;
+    public long playerId;
 
 	void Start ()
     {
