@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using Newtonsoft.Json;
 
 /// <summary>
 /// Data representing single cell.
@@ -12,10 +13,16 @@ public class CellData : EntityData
         get { return base.ViewResource + "CellView"; }
     }
 
+    [JsonIgnore]
+    public long OwnerId
+    {
+        get { return ownerId != null ? ownerId.value : 0; }
+    }
+
     /// <summary>
     /// Identifier of the owner Player..
     /// </summary>
-    public long ownerId;
+    public SyncanoReference ownerId;
 
     /// <summary>
     /// Size of the cell.

@@ -32,7 +32,7 @@ public class GameModel
     {
         foreach (var item in myCells)
         {
-            if (item.ownerId == playerId)
+            if (item.OwnerId == playerId)
                 return item;
         }
 
@@ -51,7 +51,7 @@ public class GameModel
 
         foreach (var item in allCells)
         {
-            if (item.ownerId == MyPlayer.id)
+            if (item.OwnerId == MyPlayer.id)
             {
                 MyCells.Add(item);
             }

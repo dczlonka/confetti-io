@@ -2,7 +2,7 @@
 using System.Collections;
 
 [System.Serializable]
-public struct SyncanoReference
+public class SyncanoReference
 {
     public string type;
     public string target;
