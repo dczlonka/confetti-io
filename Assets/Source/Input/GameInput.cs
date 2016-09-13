@@ -17,18 +17,20 @@ public class GameInput : Singleton<GameInput>
 
     void Awake ()
     {
-        if (Application.platform == RuntimePlatform.OSXEditor || Application.platform == RuntimePlatform.WindowsEditor)
-        {
-            currentInput = touchInput;
-        }
-        else if (Application.platform == RuntimePlatform.Android || Application.platform == RuntimePlatform.IPhonePlayer)
-        {
-            currentInput = touchInput;
-        }
-        else
-        {
-            currentInput = hardwareInput;
-        }
+        currentInput = touchInput;
+
+//        if (Application.platform == RuntimePlatform.OSXEditor || Application.platform == RuntimePlatform.WindowsEditor)
+//        {
+//            currentInput = touchInput;
+//        }
+//        else if (Application.platform == RuntimePlatform.Android || Application.platform == RuntimePlatform.IPhonePlayer)
+//        {
+//            currentInput = touchInput;
+//        }
+//        else
+//        {
+//            currentInput = hardwareInput;
+//        }
     }
 
     public void Enable ()
