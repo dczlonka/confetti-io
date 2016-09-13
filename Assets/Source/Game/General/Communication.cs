@@ -7,6 +7,7 @@ public class Communication
     private GameController controller;
     private long roomId;
     private long myPlayerId;
+    private List<CellData> syncCells = new List<CellData>();
 
     private bool isRunning;
     private Coroutine syncLoop;
@@ -53,9 +54,6 @@ public class Communication
 
     public Coroutine SendMyCellPositions()
     {
-//        if (controller.GameModel.MyCells != null)
-//            Debug.Log("Send: " + controller.GameModel.MyCells.Count);
-
         return controller.StartCoroutine(SendCellPositions(controller.GameModel.MyCells));
     }
 
@@ -63,10 +61,12 @@ public class Communication
     {
         if (cells != null)
         {
-            foreach (var item in cells)
+            syncCells.AddRange(cells);
+            foreach (var item in syncCells)
             {
                 yield return SyncanoWrapper.Please().Save(item, null);
             }
+            syncCells.Clear();
         }
     }
 
@@ -86,6 +86,6 @@ public class Communication
             controller.UpdateCells(response.Objects);
 
 
-        //GetCells(); // Try update again.
+        GetCells(); // Try update again.
     }
 }

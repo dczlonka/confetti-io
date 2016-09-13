@@ -6,34 +6,43 @@ public class CellView : EntityView
     public const float MAX_SPEED = 2.5f;
     public const float ACCELERATION = 5f;
 
+    private CellData CellData { get { return Data as CellData; } }
     private Rigidbody2D rigid;
     private float speed = 0;
+    private long playerId;
 
 	void Start ()
     {
         rigid = GetComponent<Rigidbody2D>();
+        playerId = GameController.Instance.GameModel.MyPlayer.id;
 	}
 	
 	void Update ()
     {
-        if (GameInput.Axis != Vector3.zero)
+        if (CellData != null)
         {
-            // Accelerate
-            speed = Mathf.Lerp(speed, MAX_SPEED, ACCELERATION * Time.deltaTime);
-            rigid.velocity = GameInput.Axis * speed;
-        }
-        else
-        {
-            // Deccelerate
-            speed = Mathf.Lerp(speed, 0, ACCELERATION * Time.deltaTime);
-            rigid.velocity = rigid.velocity.normalized * speed;
-        }
+            if (CellData.OwnerId == playerId)
+            {
+                if (GameInput.Axis != Vector3.zero)
+                {
+                    // Accelerate
+                    speed = Mathf.Lerp(speed, MAX_SPEED, ACCELERATION * Time.deltaTime);
+                    rigid.velocity = GameInput.Axis * speed;
+                }
+                else
+                {
+                    // Deccelerate
+                    speed = Mathf.Lerp(speed, 0, ACCELERATION * Time.deltaTime);
+                    rigid.velocity = rigid.velocity.normalized * speed;
+                }
 
-        if (Data != null)
-        {
-            //transform.position = new Vector3(Data.x, Data.y, 0);
-            Data.x = transform.position.x;
-            Data.y = transform.position.y;
+                CellData.x = transform.position.x;
+                CellData.y = transform.position.y;
+            }
+            else
+            {
+                rigid.MovePosition(new Vector3(Data.x, Data.y, 0));
+            }
         }
 	}
 }
