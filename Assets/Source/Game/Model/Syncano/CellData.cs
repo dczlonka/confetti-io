@@ -19,10 +19,13 @@ public class CellData : EntityData
         get { return ownerId != null ? ownerId.value : 0; }
     }
 
+	public CellData () { }
+
     /// <summary>
     /// Identifier of the owner Player..
     /// </summary>
-    public SyncanoReference ownerId;
+	[JsonProperty("ownerId")]
+	public SyncanoReference ownerId { get; set; }
 
     /// <summary>
     /// Size of the cell.

@@ -83,7 +83,7 @@ public class Communication
             return;
 
         if (response.IsSuccess)
-            controller.UpdateCells(response.objects);
+            controller.UpdateCells(response.Objects);
 
 
         //GetCells(); // Try update again.
