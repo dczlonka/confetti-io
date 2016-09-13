@@ -4,25 +4,35 @@ using System.Collections.Generic;
 
 public class GameModel
 {
-    public RoomData room { get; private set; }
-    public PlayerData myPlayer { get; private set; }
+    public long RoomId { get; private set; }
 
-    public CellData mainCell { get; private set; } // Cell to controll.
-    public List<CellData> myCells { get; private set; } // All my player cells.
+    /// <summary>
+    /// All cells that belong to players.
+    /// </summary>
+    public List<CellData> Cells { get; private set; }
+    public PlayerData MyPlayer { get; private set; }
 
-    public GameModel(RoomData room, PlayerData myPlayer)
+    public CellData MainCell { get; private set; } // Cell to controll.
+    public List<CellData> MyCells { get; private set; } // All my player cells.
+
+    public GameModel(long roomId, PlayerData myPlayer)
     {
-        this.room = room;
-        this.myPlayer = myPlayer;
-        PickMainCell(myPlayer.id);
-        SetMyCells(room.cells);
+        this.RoomId = roomId;
+        this.MyPlayer = myPlayer;
     }
 
-    public CellData PickMainCell(long playerId)
+    public void UpdateCells(List<CellData> allCells)
     {
-        foreach (var item in room.cells)
+        Cells = allCells;
+        SetMyCells(allCells);
+        MainCell = PickMainCell(MyPlayer.id, MyCells);
+    }
+
+    public CellData PickMainCell(long playerId, List<CellData> myCells)
+    {
+        foreach (var item in myCells)
         {
-            if (item.ownerId == playerId)
+            if (item.ownerId != null && item.ownerId.value == playerId)
                 return item;
         }
 
@@ -31,19 +41,19 @@ public class GameModel
 
     public void SetMyCells(List<CellData> allCells)
     {
-        if (myCells == null)
-            myCells = new List<CellData>();
+        if (MyCells == null)
+            MyCells = new List<CellData>();
         else
-            myCells.Clear();
+            MyCells.Clear();
 
         if (allCells == null)
             return;
 
         foreach (var item in allCells)
         {
-            if (item.ownerId == myPlayer.id)
+            if (item.ownerId != null && item.ownerId.value == MyPlayer.id)
             {
-                allCells.Add(item);
+                MyCells.Add(item);
             }
         }
     }

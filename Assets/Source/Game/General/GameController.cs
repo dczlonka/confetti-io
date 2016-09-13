@@ -8,23 +8,22 @@ public class GameController : Singleton<GameController>
     public GameModel GameModel { get; private set; }
     private Communication communication;
 
-    public void StartGame(RoomData room, PlayerData myPlayer)
+    public void StartGame(long roomId, PlayerData myPlayer)
     {
-        if (room == null)
+        if (roomId == 0)
         {
             StopGame();
             throw new UnityException("Trying to start but there's no room!");
         }
 
-        if (myPlayer == null)
+        if (myPlayer == null || myPlayer.id == 0)
         {
             StopGame();
             throw new UnityException("Trying to start but player is missing!");
         }
 
-        GameModel = new GameModel(room, myPlayer);
+        GameModel = new GameModel(roomId, myPlayer);
         GameView = GetComponent<GameView>();
-        GameView.CreateViews(GameModel.room.cells);
 
         communication = new Communication(this);
         communication.StartSyncLoop();
@@ -37,8 +36,7 @@ public class GameController : Singleton<GameController>
 
     public void UpdateCells(List<CellData> cells)
     {
-        GameModel.room.cells.Clear();
-        GameModel.room.cells = cells;
+        GameModel.UpdateCells(cells);
         GameView.UpdateViews(cells);
     }
 }

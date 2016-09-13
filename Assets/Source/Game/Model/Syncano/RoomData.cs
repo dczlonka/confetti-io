@@ -13,9 +13,4 @@ public class RoomData : SyncanoObject
     /// Players participating in game.
     /// </summary>
     public List<PlayerData> players;
-
-    /// <summary>
-    /// All cells that belong to players.
-    /// </summary>
-    public List<CellData> cells;
 }

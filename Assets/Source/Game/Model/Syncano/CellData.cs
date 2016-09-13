@@ -15,7 +15,7 @@ public class CellData : EntityData
     /// <summary>
     /// Identifier of the owner Player..
     /// </summary>
-    public long ownerId;
+    public SyncanoReference ownerId;
 
     /// <summary>
     /// Size of the cell.

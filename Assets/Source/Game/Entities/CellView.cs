@@ -28,5 +28,12 @@ public class CellView : EntityView
             speed = Mathf.Lerp(speed, 0, ACCELERATION * Time.deltaTime);
             rigid.velocity = rigid.velocity.normalized * speed;
         }
+
+        if (Data != null)
+        {
+            //transform.position = new Vector3(Data.x, Data.y, 0);
+            Data.x = transform.position.x;
+            Data.y = transform.position.y;
+        }
 	}
 }

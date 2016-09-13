@@ -9,6 +9,12 @@ public class Gameplay : MonoBehaviour
     void Start()
     {
         controller = GameController.Instance;
+        PlayerData player = new PlayerData();
+        player.id = 341;
+        player.isAlive = true;
+        player.nick = "tester1";
+
+        controller.StartGame(Constants.ROOM_ID, player);
         GetRoom();
     }
 

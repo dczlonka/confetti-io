@@ -53,14 +53,20 @@ public class Communication
 
     public Coroutine SendMyCellPositions()
     {
-        return controller.StartCoroutine(SendCellPositions(controller.GameModel.myCells));
+//        if (controller.GameModel.MyCells != null)
+//            Debug.Log("Send: " + controller.GameModel.MyCells.Count);
+
+        return controller.StartCoroutine(SendCellPositions(controller.GameModel.MyCells));
     }
 
     private IEnumerator SendCellPositions(List<CellData> cells)
     {
-        foreach (var item in cells)
+        if (cells != null)
         {
-            yield return SyncanoWrapper.Please().Save(item, null);
+            foreach (var item in cells)
+            {
+                yield return SyncanoWrapper.Please().Save(item, null);
+            }
         }
     }
 
@@ -80,6 +86,6 @@ public class Communication
             controller.UpdateCells(response.objects);
 
 
-        GetCells(); // Try update again.
+        //GetCells(); // Try update again.
     }
 }

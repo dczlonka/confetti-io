@@ -10,7 +10,7 @@ public class EntityData : SyncanoObject
 {
     public virtual string ViewResource
     {
-        get { return "/Views/"; }
+        get { return "Views/"; }
     }
 
     public EntityView View { get; private set; }
@@ -27,9 +27,11 @@ public class EntityData : SyncanoObject
 
     public EntityView CreateView()
     {
-        GameObject go = Resources.Load(ViewResource) as GameObject;
-        if (go == null)
+        GameObject prefab = Resources.Load<GameObject>(ViewResource);
+        if (prefab == null)
             throw new UnityException("View not found: " + ViewResource);
+
+        GameObject go = (GameObject) GameObject.Instantiate(prefab, new Vector3(x, y, 0), Quaternion.identity);
 
         EntityView ev = go.GetComponent<EntityView>();
         if (ev == null)
