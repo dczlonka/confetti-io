@@ -1,15 +1,19 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using Syncano.Data;
 
 public class Communication
 {
+    public const float PLAYER_HEARTBEAT_INTERVAL = 60; // 60 seconds
+
     private GameController controller;
     private GameModel model;
     private List<CellData> syncCells = new List<CellData>();
 
     private bool isRunning;
     private Coroutine syncLoop;
+    private Coroutine playerHeartbeat;
 
     public Communication (GameController controller)
     {
@@ -21,6 +25,7 @@ public class Communication
         this.model = model;
         isRunning = true;
         syncLoop = controller.StartCoroutine(SyncLoop());
+        playerHeartbeat = controller.StartCoroutine(PlayerHeartbeat());
         GetCells();
     }
 
@@ -31,7 +36,9 @@ public class Communication
         if (syncLoop != null)
         {
             controller.StopCoroutine(syncLoop);
+            controller.StopCoroutine(playerHeartbeat);
             syncLoop = null;
+            playerHeartbeat = null;
         }
     }
 
@@ -40,6 +47,23 @@ public class Communication
         while (isRunning)
         {
             yield return SendMyCellPositions();
+        }
+    }
+
+    private IEnumerator PlayerHeartbeat()
+    {
+        while (isRunning)
+        {
+            if (model.Player != null)
+            {
+                model.Player.revisionCounter++; // Increment to change updated at date.
+                yield return SyncanoWrapper.Please().Save(model.Player, OnPlayerSaved);
+                yield return new WaitForSeconds(PLAYER_HEARTBEAT_INTERVAL);
+            }
+            else
+            {
+                yield return null;
+            }
         }
     }
 
@@ -80,5 +104,16 @@ public class Communication
 
 
         GetCells(); // Try update again.
+    }
+
+    //--------------------------- Player heartbeat ---------------------------//
+
+    private void OnPlayerSaved(Response<PlayerData> response)
+    {
+        if (!isRunning)
+            return;
+
+        if (response.IsSuccess)
+            model.Player.revisionCounter = response.Data.revisionCounter;
     }
 }

@@ -90,7 +90,7 @@ public class Gameplay : MonoBehaviour
     {
         if (response.IsSuccess)
         {
-            player = JsonConvert.DeserializeObject<PlayerData>(response.stdout);
+            player = JsonConvert.DeserializeObject<PlayerData>(response.stdout, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
             controller.Join(player);
             StartGame(player.id, Constants.ROOM_ID);
             menuPanel.Hide();
