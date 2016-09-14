@@ -218,7 +218,6 @@ namespace Syncano.Client {
 						if(method.Equals(UnityWebRequest.kHttpVerbDELETE) == false)
 						{
 							response.SetData(json);
-
 						}
 						onSuccess.DynamicInvoke(response);
 					}
@@ -273,11 +272,11 @@ namespace Syncano.Client {
 				}
 			}
 
-			UnityWebRequest www = UnityWebRequest.Post(sb.ToString(), postData); //PrepareWebRequest(sb.ToString(), null, UnityWebRequest.kHttpVerbGET);
+			UnityWebRequest www = UnityWebRequest.Post(sb.ToString(), postData);
 
 			yield return www.Send();
 
-			ScriptEndpoint response = JsonConvert.DeserializeObject<ScriptEndpoint>(www.downloadHandler.text); //JsonUtility.FromJson<ScriptEndpoint>(www.downloadHandler.text);
+			ScriptEndpoint response = JsonConvert.DeserializeObject<ScriptEndpoint>(www.downloadHandler.text, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
 			ReadWebRequest(response, www);
 
 			if(response.IsSuccess)

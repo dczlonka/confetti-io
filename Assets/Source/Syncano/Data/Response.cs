@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using Syncano.Request;
+using Newtonsoft.Json;
 
 namespace Syncano.Data {
 	
@@ -16,7 +17,7 @@ namespace Syncano.Data {
 
 		public virtual void SetData(string json)
 		{
-			Data = Newtonsoft.Json.JsonConvert.DeserializeObject<T>(json);
+			Data = Newtonsoft.Json.JsonConvert.DeserializeObject<T>(json, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
 		}
 }
 }

@@ -21,7 +21,7 @@ public class ResponseGetList<T> : Response<T>  where T : SyncanoObject, new() {
 
 	public override void SetData (string json)
 	{
-		JsonSerializerSettings settings = new JsonSerializerSettings{ NullValueHandling = NullValueHandling.Ignore };
+		JsonSerializerSettings settings = new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore };
 		Newtonsoft.Json.JsonConvert.PopulateObject(json, this, settings);
 	}
 }
