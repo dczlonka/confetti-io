@@ -46,7 +46,6 @@ public class Gameplay : MonoBehaviour
     {
         if (string.IsNullOrEmpty(menuPanel.Nickname) == false)
         {
-            menuPanel.Hide();
             JoinRoom(menuPanel.Nickname, Constants.ROOM_ID);
         }
     }
@@ -65,8 +64,8 @@ public class Gameplay : MonoBehaviour
 
         if (response.IsSuccess)
         {
-            Debug.Log("Downloaded room");
             menuPanel.Show();
+            menuPanel.SetEditMode();
             controller.StartGame(Constants.ROOM_ID);
         }
         else
@@ -79,6 +78,7 @@ public class Gameplay : MonoBehaviour
 
     private void JoinRoom(string nick, long roomId)
     {
+        menuPanel.SetLoadingMode();
         Dictionary<string, string> payload = new Dictionary<string, string>();
         payload.Add("nickname", nick);
         payload.Add("room_id", roomId.ToString());
@@ -93,9 +93,11 @@ public class Gameplay : MonoBehaviour
             player = JsonConvert.DeserializeObject<PlayerData>(response.stdout);
             controller.Join(player);
             StartGame(player.id, Constants.ROOM_ID);
+            menuPanel.Hide();
         }
         else
         {
+            menuPanel.SetEditMode();
             Debug.Log("Error: " + response.syncanoError);
         }
     }

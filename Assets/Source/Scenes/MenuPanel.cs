@@ -10,6 +10,9 @@ public class MenuPanel : MonoBehaviour
     [SerializeField]
     private InputField nicknameField;
 
+    [SerializeField]
+    private Image loadingImage;
+
     public string Nickname { get { return nicknameField.text; } set { nicknameField.text = value; } }
     public Button.ButtonClickedEvent OnPlayClicked { get { return playButton.onClick; } }
 
@@ -23,4 +26,17 @@ public class MenuPanel : MonoBehaviour
         gameObject.SetActive(false);
     }
 
+    public void SetLoadingMode()
+    {
+        playButton.interactable = false;
+        nicknameField.interactable = false;
+        loadingImage.gameObject.SetActive(true);
+    }
+
+    public void SetEditMode()
+    {
+        playButton.interactable = true;
+        nicknameField.interactable = true;
+        loadingImage.gameObject.SetActive(false);
+    }
 }
