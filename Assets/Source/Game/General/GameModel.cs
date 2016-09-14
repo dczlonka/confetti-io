@@ -5,27 +5,35 @@ using System.Collections.Generic;
 public class GameModel
 {
     public long RoomId { get; private set; }
+    public long PlayerId { get { return Player != null ? Player.id : 0; } }
 
     /// <summary>
     /// All cells that belong to players.
     /// </summary>
     public List<CellData> Cells { get; private set; }
-    public PlayerData MyPlayer { get; private set; }
+    public PlayerData Player { get; private set; }
 
     public CellData MainCell { get; private set; } // Cell to controll.
     public List<CellData> MyCells { get; private set; } // All my player cells.
 
-    public GameModel(long roomId, PlayerData myPlayer)
+    public GameModel(long roomId)
     {
         this.RoomId = roomId;
-        this.MyPlayer = myPlayer;
+    }
+
+    public void SetMyPlayer(PlayerData player)
+    {
+        Player = player;
     }
 
     public void UpdateCells(List<CellData> allCells)
     {
         Cells = allCells;
-        SetMyCells(allCells);
-        MainCell = PickMainCell(MyPlayer.id, MyCells);
+        if (Player != null)
+        {
+            SetMyCells(Player.id, allCells);
+            MainCell = PickMainCell(Player.id, MyCells);
+        }
     }
 
     public CellData PickMainCell(long playerId, List<CellData> myCells)
@@ -39,7 +47,7 @@ public class GameModel
         return null;
     }
 
-    public void SetMyCells(List<CellData> allCells)
+    public void SetMyCells(long playerId, List<CellData> allCells)
     {
         if (MyCells == null)
             MyCells = new List<CellData>();
@@ -51,7 +59,7 @@ public class GameModel
 
         foreach (var item in allCells)
         {
-            if (item.OwnerId == MyPlayer.id)
+            if (item.OwnerId == playerId)
             {
                 MyCells.Add(item);
             }

@@ -5,8 +5,7 @@ using System.Collections.Generic;
 public class Communication
 {
     private GameController controller;
-    private long roomId;
-    private long myPlayerId;
+    private GameModel model;
     private List<CellData> syncCells = new List<CellData>();
 
     private bool isRunning;
@@ -17,11 +16,12 @@ public class Communication
         this.controller = controller;
     }
 
-    public void StartGame(long roomId, long myPlayerId)
+    public void StartSyncLoop(GameModel model)
     {
-        this.roomId = roomId;
-        this.myPlayerId = myPlayerId;
-        StartSyncLoop();
+        this.model = model;
+        isRunning = true;
+        syncLoop = controller.StartCoroutine(SyncLoop());
+        GetCells();
     }
 
     public void StopSyncLoop()
@@ -33,13 +33,6 @@ public class Communication
             controller.StopCoroutine(syncLoop);
             syncLoop = null;
         }
-    }
-
-    public void StartSyncLoop()
-    {
-        isRunning = true;
-        syncLoop = controller.StartCoroutine(SyncLoop());
-        GetCells();
     }
 
     private IEnumerator SyncLoop()
@@ -54,7 +47,7 @@ public class Communication
 
     public Coroutine SendMyCellPositions()
     {
-        return controller.StartCoroutine(SendCellPositions(controller.GameModel.MyCells));
+        return controller.StartCoroutine(SendCellPositions(model.MyCells));
     }
 
     private IEnumerator SendCellPositions(List<CellData> cells)

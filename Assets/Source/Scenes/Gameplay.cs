@@ -21,7 +21,7 @@ public class Gameplay : MonoBehaviour
     {
         controller = GameController.Instance;
         menuPanel.OnPlayClicked.AddListener(OnPlayClicked);
-        menuPanel.Show();
+        GetRoom();
     }
 
 	void Update ()
@@ -51,11 +51,34 @@ public class Gameplay : MonoBehaviour
         }
     }
 
+    //------------------------ Room ------------------------//
+
+    private void GetRoom()
+    {
+        ShowLoadingScreen();
+        SyncanoWrapper.Please().Get<RoomData>(Constants.ROOM_ID, OnRoomDownloaded);
+    }
+
+    private void OnRoomDownloaded(Response<RoomData> response)
+    {
+        HideLoadingScreen();
+
+        if (response.IsSuccess)
+        {
+            Debug.Log("Downloaded room");
+            menuPanel.Show();
+            controller.StartGame(Constants.ROOM_ID);
+        }
+        else
+        {
+            Debug.Log("Error: " + response.syncanoError);
+        }
+    }
+
     //------------------------ Join ------------------------//
 
     private void JoinRoom(string nick, long roomId)
     {
-        ShowLoadingScreen();
         Dictionary<string, string> payload = new Dictionary<string, string>();
         payload.Add("nickname", nick);
         payload.Add("room_id", roomId.ToString());
@@ -67,8 +90,8 @@ public class Gameplay : MonoBehaviour
     {
         if (response.IsSuccess)
         {
-            HideLoadingScreen();
             player = JsonConvert.DeserializeObject<PlayerData>(response.stdout);
+            controller.Join(player);
             StartGame(player.id, Constants.ROOM_ID);
         }
         else
@@ -92,30 +115,11 @@ public class Gameplay : MonoBehaviour
     {
         if (response.IsSuccess)
         {
-            controller.StartGame(Constants.ROOM_ID, player);
             GameInput.Instance.Enable();
         }
         else
         {
             Debug.Log("Error: " + response.syncanoError);
-            StartGame(player.id, Constants.ROOM_ID);
         }
     }
-
-    //------------------------ Room ------------------------//
-
-    //    private void GetRoom()
-    //    {
-    //        SyncanoWrapper.Please().Get<RoomData>(Constants.ROOM_ID, OnRoomDownloadSuccess, OnRoomDownloadFali);
-    //    }
-    //
-    //    private void OnRoomDownloadSuccess(Response<RoomData> response)
-    //    {
-    //        Debug.Log("Downloaded room");
-    //    }
-    //
-    //    private void OnRoomDownloadFali(Response<RoomData> response)
-    //    {
-    //        Debug.Log("Failed to download room: " + response.syncanoError);
-    //    }
 }

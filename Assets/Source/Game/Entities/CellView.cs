@@ -9,19 +9,19 @@ public class CellView : EntityView
     private CellData CellData { get { return Data as CellData; } }
     private Rigidbody2D rigid;
     private float speed = 0;
-    public long playerId;
+    private GameModel model;
 
 	void Start ()
     {
         rigid = GetComponent<Rigidbody2D>();
-        playerId = GameController.Instance.GameModel.MyPlayer.id;
+        model = GameController.Instance.GameModel;
 	}
 	
 	void Update ()
     {
         if (CellData != null)
         {
-            if (CellData.OwnerId == playerId)
+            if (CellData.OwnerId != 0 && CellData.OwnerId == model.PlayerId)
             {
                 if (GameInput.Axis != Vector3.zero)
                 {

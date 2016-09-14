@@ -6,32 +6,50 @@ public class GameController : Singleton<GameController>
 {
     public GameView GameView { get; private set; }
     public GameModel GameModel { get; private set; }
+    public bool IsRunning { get; private set; }
     private Communication communication;
 
-    public void StartGame(long roomId, PlayerData myPlayer)
+    public void StartGame(long roomId)
     {
-        if (roomId == 0)
+        if (IsRunning)
         {
-            StopGame();
-            throw new UnityException("Trying to start but there's no room!");
+            Debug.LogWarning("Game is already running!");
         }
-
-        if (myPlayer == null || myPlayer.id == 0)
+        else
         {
-            StopGame();
-            throw new UnityException("Trying to start but player is missing!");
+            if (roomId == 0)
+            {
+                StopGame();
+                throw new UnityException("Trying to start but there's no room!");
+            }
+
+            IsRunning = true;
+            GameModel = new GameModel(roomId);
+            GameView = GetComponent<GameView>();
+
+            communication = new Communication(this);
+            communication.StartSyncLoop(GameModel);
         }
+    }
 
-        GameModel = new GameModel(roomId, myPlayer);
-        GameView = GetComponent<GameView>();
-
-        communication = new Communication(this);
-        communication.StartSyncLoop();
+    public void Join(PlayerData myPlayer)
+    {
+        if (myPlayer != null && myPlayer.id != 0)
+        {
+            GameModel.SetMyPlayer(myPlayer);
+        }
     }
 
     public void StopGame()
     {
-        communication.StopSyncLoop();
+        if (IsRunning)
+        {
+            communication.StopSyncLoop();
+        }
+        else
+        {
+            Debug.LogWarning("Game already stopped!");
+        }
     }
 
     public void UpdateCells(List<CellData> cells)
