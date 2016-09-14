@@ -17,6 +17,12 @@ public class CellView : EntityView
         model = GameController.Instance.GameModel;
 	}
 	
+    public override void BindData (EntityData data)
+    {
+        base.BindData (data);
+        gameObject.name = "Cell " + data.id;
+    }
+
 	void Update ()
     {
         if (CellData != null)
@@ -45,4 +51,23 @@ public class CellView : EntityView
             }
         }
 	}
+
+    void OnTriggerEnter2D(Collider2D other)
+    {
+        CellView cell = other.GetComponent<CellView>();
+
+        if (cell != null && cell.Data.id < Data.id) // It will make it call only on one collider side.
+        {
+            if (cell.CellData.size > CellData.size)
+            {
+                Debug.Log("Delete: " + CellData.id);
+                SyncanoWrapper.Please().Delete(CellData, null);
+            }
+            else if (cell.CellData.size < CellData.size)
+            {
+                Debug.Log("Delete: " + cell.CellData.id);
+                SyncanoWrapper.Please().Delete(cell.CellData, null);
+            }
+        }
+    }
 }

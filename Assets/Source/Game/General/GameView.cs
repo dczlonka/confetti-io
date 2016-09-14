@@ -5,6 +5,8 @@ using System.Collections.Generic;
 public class GameView : MonoBehaviour
 {
     private Dictionary<long, CellView> cellViews = new Dictionary<long, CellView>();
+    private HashSet<long> ids = new HashSet<long>();
+    private HashSet<long> idsToRemove = new HashSet<long>();
 
     public void CreateViews(List<CellData> cells)
     {
@@ -28,8 +30,7 @@ public class GameView : MonoBehaviour
 
     public void UpdateViews(List<CellData> cells)
     {
-        HashSet<long> ids = new HashSet<long>();
-
+        ids.Clear();
         foreach (var cell in cells)
         {
             if (cellViews.ContainsKey(cell.id))
@@ -47,15 +48,23 @@ public class GameView : MonoBehaviour
             ids.Add(cell.id);
         }
 
-        // Remove not existing cells
+
+        idsToRemove.Clear();
+        // Prepare list of not existing cells
         foreach (var entityId in cellViews.Keys)
         {
             if (ids.Contains(entityId) == false)
             {
-                EntityView view = cellViews[entityId];
-                cellViews.Remove(entityId);
-                Destroy(view);
+                idsToRemove.Add(entityId);
             }
+        }
+
+        // Remove not existing cells
+        foreach (var entityId in idsToRemove)
+        {
+            EntityView view = cellViews[entityId];
+            cellViews.Remove(entityId);
+            Destroy(view.gameObject);
         }
     }
 
