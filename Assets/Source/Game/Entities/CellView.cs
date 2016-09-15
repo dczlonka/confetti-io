@@ -15,6 +15,7 @@ public class CellView : EntityView
     private Rigidbody2D rigid;
     private float speed = 0;
     private GameModel model;
+    private int size;
 
 	void Start ()
     {
@@ -26,6 +27,12 @@ public class CellView : EntityView
     {
         base.BindData (data);
         gameObject.name = "Cell " + data.id;
+
+        if (size != CellData.size)
+        {
+            size = CellData.size;
+            Resize();
+        }
     }
 
 	void Update ()
@@ -87,5 +94,36 @@ public class CellView : EntityView
         {
             GameController.Instance.Communication.TryEatFood(Data.id, food.Data.id);
         }
+    }
+
+    private Coroutine resizeRoutine;
+    private void Resize()
+    {
+        if (resizeRoutine != null)
+            StopCoroutine(resizeRoutine);
+
+        resizeRoutine = StartCoroutine(ResizeRoutine());
+    }
+
+    private IEnumerator ResizeRoutine()
+    {
+        float scale = Size2Scale(size);
+        Vector3 newScale = new Vector3(scale, scale, scale);
+
+        while (Vector3.Distance(transform.localScale, newScale) > 0.01f)
+        {
+            transform.localScale = Vector3.Lerp(transform.localScale, newScale, Time.deltaTime * 10);
+            yield return null;
+        }
+
+        resizeRoutine = null;
+    }
+
+    private float Size2Scale(int size)
+    {
+        if (size < 5)
+            return 0.5f;
+
+        return (float)size / 10.0f;
     }
 }
