@@ -57,4 +57,10 @@ public class GameController : Singleton<GameController>
         GameModel.UpdateCells(cells);
         GameView.UpdateViews(cells);
     }
+
+    public void UpdateFood(List<FoodData> food)
+    {
+        GameModel.UpdateFood(food);
+        GameView.UpdateViews(food);
+    }
 }

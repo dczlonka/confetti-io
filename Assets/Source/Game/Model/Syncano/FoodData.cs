@@ -7,5 +7,8 @@ using System.Collections;
 [System.Serializable]
 public class FoodData : EntityData
 {
-
+    public override string ViewResource
+    {
+        get { return base.ViewResource + "FoodView"; }
+    }
 }

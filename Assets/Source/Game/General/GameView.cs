@@ -5,8 +5,7 @@ using System.Collections.Generic;
 public class GameView : MonoBehaviour
 {
     private Dictionary<long, CellView> cellViews = new Dictionary<long, CellView>();
-    private HashSet<long> ids = new HashSet<long>();
-    private HashSet<long> idsToRemove = new HashSet<long>();
+    private Dictionary<long, FoodView> foodViews = new Dictionary<long, FoodView>();
 
     public void CreateViews(List<CellData> cells)
     {
@@ -28,9 +27,17 @@ public class GameView : MonoBehaviour
         }
     }
 
+    private void AddView(FoodData data)
+    {
+        EntityView view = data.CreateView();
+        foodViews.Add(data.id, view as FoodView);
+    }
+
     public void UpdateViews(List<CellData> cells)
     {
-        ids.Clear();
+        HashSet<long> ids = new HashSet<long>();
+        HashSet<long> idsToRemove = new HashSet<long>();
+
         foreach (var cell in cells)
         {
             if (cellViews.ContainsKey(cell.id))
@@ -48,8 +55,6 @@ public class GameView : MonoBehaviour
             ids.Add(cell.id);
         }
 
-
-        idsToRemove.Clear();
         // Prepare list of not existing cells
         foreach (var entityId in cellViews.Keys)
         {
@@ -64,6 +69,46 @@ public class GameView : MonoBehaviour
         {
             EntityView view = cellViews[entityId];
             cellViews.Remove(entityId);
+            Destroy(view.gameObject);
+        }
+    }
+
+    public void UpdateViews(List<FoodData> foods)
+    {
+        HashSet<long> ids = new HashSet<long>();
+        HashSet<long> idsToRemove = new HashSet<long>();
+
+        foreach (var food in foods)
+        {
+            if (foodViews.ContainsKey(food.id))
+            {
+                // Update
+                FoodView view = foodViews[food.id];
+                view.BindData(food);
+            }
+            else
+            {
+                // Add new
+                AddView(food);
+            }
+
+            ids.Add(food.id);
+        }
+
+        // Prepare list of not existing cells
+        foreach (var entityId in foodViews.Keys)
+        {
+            if (ids.Contains(entityId) == false)
+            {
+                idsToRemove.Add(entityId);
+            }
+        }
+
+        // Remove not existing cells
+        foreach (var entityId in idsToRemove)
+        {
+            EntityView view = foodViews[entityId];
+            foodViews.Remove(entityId);
             Destroy(view.gameObject);
         }
     }

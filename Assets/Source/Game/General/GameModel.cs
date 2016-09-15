@@ -7,10 +7,8 @@ public class GameModel
     public long RoomId { get; private set; }
     public long PlayerId { get { return Player != null ? Player.id : 0; } }
 
-    /// <summary>
-    /// All cells that belong to players.
-    /// </summary>
     public List<CellData> Cells { get; private set; }
+    public List<FoodData> Food { get; private set; }
     public PlayerData Player { get; private set; }
 
     public CellData MainCell { get; private set; } // Cell to controll.
@@ -34,6 +32,11 @@ public class GameModel
             SetMyCells(Player.id, allCells);
             MainCell = PickMainCell(Player.id, MyCells);
         }
+    }
+
+    public void UpdateFood(List<FoodData> allFood)
+    {
+        Food = allFood;
     }
 
     public CellData PickMainCell(long playerId, List<CellData> myCells)

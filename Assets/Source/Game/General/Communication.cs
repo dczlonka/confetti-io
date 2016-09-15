@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using Syncano.Data;
+using Newtonsoft.Json;
 
 public class Communication
 {
@@ -27,6 +28,7 @@ public class Communication
         syncLoop = controller.StartCoroutine(SyncLoop());
         playerHeartbeat = controller.StartCoroutine(PlayerHeartbeat());
         GetCells();
+        GetFood();
     }
 
     public void StopSyncLoop()
@@ -123,6 +125,29 @@ public class Communication
         if (response.IsSuccess)
             Debug.Log(response.stdout);
             //controller.UpdateCells(response.Objects);
+    }
+
+    //--------------------------- Get food ---------------------------//
+
+    public void GetFood()
+    {
+        Dictionary<string, string> payload = new Dictionary<string, string>();
+        payload.Add("room_id", model.RoomId.ToString());
+        SyncanoWrapper.Please().CallScriptEndpoint(Constants.ENDPOINT_GET_FOOD_ID, Constants.ENDPOINT_GET_FOOD, OnFoodsDownloaded, payload);
+    }
+
+    private void OnFoodsDownloaded(ScriptEndpoint response)
+    {
+        if (!isRunning)
+            return;
+
+        if (response.IsSuccess)
+        {
+            List<FoodData> food = DeserializeJson<List<FoodData>>(response.stdout);
+            controller.UpdateFood(food);
+        }
+
+        GetFood();
     }
 
     //--------------------------- Player heartbeat ---------------------------//
@@ -252,5 +277,12 @@ public class Communication
         }
 
         return false;
+    }
+
+    //--------------------------- Tools ---------------------------//
+
+    public static T DeserializeJson<T>(string json)
+    {
+        return JsonConvert.DeserializeObject<T>(json, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
     }
 }

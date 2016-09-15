@@ -22,4 +22,7 @@ public class Constants
 
     public const string ENDPOINT_GET_ALL_PLAYERS = "get_all_players_in_room";
     public const string ENDPOINT_GET_ALL_PLAYERS_ID = "7a99f13afd3f7a1d0083c32adf1386e49b0ca26c";
+
+    public const string ENDPOINT_GET_FOOD = "get_all_food_in_room";
+    public const string ENDPOINT_GET_FOOD_ID = "36d9f9db35849c3e64930e7d73b83419058958c0";
 }

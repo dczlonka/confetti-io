@@ -2,7 +2,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using Syncano.Data;
-using Newtonsoft.Json;
 
 public class Gameplay : MonoBehaviour
 {
@@ -90,7 +89,7 @@ public class Gameplay : MonoBehaviour
     {
         if (response.IsSuccess)
         {
-            player = JsonConvert.DeserializeObject<PlayerData>(response.stdout, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
+            player = Communication.DeserializeJson<PlayerData>(response.stdout);
             controller.Join(player);
             StartGame(player.id, Constants.ROOM_ID);
             menuPanel.Hide();
