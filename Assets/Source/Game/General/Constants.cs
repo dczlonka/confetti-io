@@ -16,4 +16,7 @@ public class Constants
 
     public const string ENDPOINT_TRY_EAT_CELL = "try_to_eat_cell";
     public const string ENDPOINT_TRY_EAT_CELL_ID = "37668782253c0b1d19823130903e896b8fa88626";
+
+    public const string ENDPOINT_TRY_EAT_FOOD = "try_to_eat_food";
+    public const string ENDPOINT_TRY_EAT_FOOD_ID = "d58022e61364097759bb598cff1608473a31934e";
 }

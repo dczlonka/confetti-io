@@ -28,7 +28,7 @@ public class CellView : EntityView
     {
         if (CellData != null)
         {
-            if (IsMyCell())
+            if (IsMyCell(CellData))
             {
                 if (GameInput.Axis != Vector3.zero)
                 {
@@ -53,9 +53,9 @@ public class CellView : EntityView
         }
 	}
 
-    private bool IsMyCell()
+    private bool IsMyCell(CellData cell)
     {
-        return CellData.OwnerId != 0 && CellData.OwnerId == model.PlayerId;
+        return cell.OwnerId != 0 && cell.OwnerId == model.PlayerId;
     }
 
     void OnTriggerEnter2D(Collider2D other)
@@ -64,10 +64,22 @@ public class CellView : EntityView
 
         if (cell != null && Data.id > cell.Data.id) // It will make it call only on one collider side.
         {
-            if (cell.CellData.size != CellData.size)
+            if (IsMyCell(CellData) || IsMyCell(cell.CellData)) // Should be invoked only by cell owners.
             {
-                GameController.Instance.Communication.TryEatCell(Data.id, cell.Data.id);
+                if (cell.CellData.size != CellData.size)
+                {
+                    GameController.Instance.Communication.TryEatCell(Data.id, cell.Data.id);
+                }
             }
+
+            return; // Don't check food
+        }
+
+        FoodView food = other.GetComponent<FoodView>();
+
+        if (food != null && food.Data != null && IsMyCell(CellData))
+        {
+            GameController.Instance.Communication.TryEatFood(Data.id, food.Data.id);
         }
     }
 }

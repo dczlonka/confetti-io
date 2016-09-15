@@ -128,7 +128,7 @@ public class Communication
         if (!isRunning)
             return;
 
-        if (ToEatContainsPair(cellA, cellB))
+        if (CellsToEatContainsPair(cellA, cellB))
         {
             return;
         }
@@ -160,13 +160,73 @@ public class Communication
     {
         cellsToEat.Remove(currentlyEating);
         isEating = false;
+        PickAndEat();
     }
 
-    private bool ToEatContainsPair(long cellA, long cellB)
+    private bool CellsToEatContainsPair(long cellA, long cellB)
     {
         foreach (var item in cellsToEat)
         {
             if ((item.Key == cellA && item.Value == cellB) || (item.Key == cellB && item.Value == cellA))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    //--------------------------- Eat food ---------------------------//
+
+    private List<KeyValuePair<long, long>> foodToEat = new List<KeyValuePair<long, long>>();
+    private KeyValuePair<long, long> currentlyEatingFood;
+    private bool isEatingFood;
+
+    public void TryEatFood(long cellId, long foodId)
+    {
+        if (!isRunning)
+            return;
+
+        if (FoodToEatContainsPair(cellId, foodId))
+        {
+            return;
+        }
+        else
+        {
+            foodToEat.Add(new KeyValuePair<long, long>(cellId, foodId));
+        }
+
+        PickFoodAndEat();
+    }
+
+    private void PickFoodAndEat()
+    {
+        if (isEating == false && cellsToEat.Count > 0)
+        {
+            isEatingFood = true;
+            currentlyEatingFood = foodToEat[0];
+
+            Dictionary<string, string> payload = new Dictionary<string, string>();
+            payload.Add("cell_id", currentlyEating.Key.ToString());
+            payload.Add("food_id", currentlyEating.Value.ToString());
+            payload.Add("room_id", model.RoomId.ToString());
+
+            SyncanoWrapper.Please().CallScriptEndpoint(Constants.ENDPOINT_TRY_EAT_CELL_ID, Constants.ENDPOINT_TRY_EAT_CELL, OnTryEatFoodFinished, payload);
+        }
+    }
+
+    private void OnTryEatFoodFinished(ScriptEndpoint response)
+    {
+        foodToEat.Remove(currentlyEatingFood);
+        isEatingFood = false;
+        PickFoodAndEat();
+    }
+
+    private bool FoodToEatContainsPair(long cellId, long foodId)
+    {
+        foreach (var item in foodToEat)
+        {
+            if ((item.Key == cellId && item.Value == foodId))
             {
                 return true;
             }
