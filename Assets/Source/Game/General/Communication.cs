@@ -255,7 +255,7 @@ public class Communication
             payload.Add("food_id", currentlyEating.Value.ToString());
             payload.Add("room_id", model.RoomId.ToString());
 
-            SyncanoWrapper.Please().CallScriptEndpoint(Constants.ENDPOINT_TRY_EAT_CELL_ID, Constants.ENDPOINT_TRY_EAT_CELL, OnTryEatFoodFinished, payload);
+            SyncanoWrapper.Please().CallScriptEndpoint(Constants.ENDPOINT_TRY_EAT_FOOD_ID, Constants.ENDPOINT_TRY_EAT_FOOD, OnTryEatFoodFinished, payload);
         }
     }
 
