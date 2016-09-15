@@ -245,7 +245,7 @@ public class Communication
 
     private void PickFoodAndEat()
     {
-        if (isEating == false && foodToEat.Count > 0)
+        if (isEatingFood == false && foodToEat.Count > 0)
         {
             isEatingFood = true;
             currentlyEatingFood = foodToEat[0];
