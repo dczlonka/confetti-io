@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using Syncano.Data;
 
 public class CellView : EntityView
 {
@@ -27,7 +28,7 @@ public class CellView : EntityView
     {
         if (CellData != null)
         {
-            if (CellData.OwnerId != 0 && CellData.OwnerId == model.PlayerId)
+            if (IsMyCell())
             {
                 if (GameInput.Axis != Vector3.zero)
                 {
@@ -52,21 +53,20 @@ public class CellView : EntityView
         }
 	}
 
+    private bool IsMyCell()
+    {
+        return CellData.OwnerId != 0 && CellData.OwnerId == model.PlayerId;
+    }
+
     void OnTriggerEnter2D(Collider2D other)
     {
         CellView cell = other.GetComponent<CellView>();
 
-        if (cell != null && cell.Data.id < Data.id) // It will make it call only on one collider side.
+        if (cell != null && Data.id > cell.Data.id) // It will make it call only on one collider side.
         {
-            if (cell.CellData.size > CellData.size)
+            if (cell.CellData.size != CellData.size)
             {
-                Debug.Log("Delete: " + CellData.id);
-                SyncanoWrapper.Please().Delete(CellData, null);
-            }
-            else if (cell.CellData.size < CellData.size)
-            {
-                Debug.Log("Delete: " + cell.CellData.id);
-                SyncanoWrapper.Please().Delete(cell.CellData, null);
+                GameController.Instance.Communication.TryEatCell(Data.id, cell.Data.id);
             }
         }
     }

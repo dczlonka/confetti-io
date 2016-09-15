@@ -116,4 +116,62 @@ public class Communication
         if (response.IsSuccess)
             model.Player.revisionCounter = response.Data.revisionCounter;
     }
+
+    //--------------------------- Eat cell ---------------------------//
+
+    private List<KeyValuePair<long, long>> cellsToEat = new List<KeyValuePair<long, long>>();
+    private KeyValuePair<long, long> currentlyEating;
+    private bool isEating;
+
+    public void TryEatCell(long cellA, long cellB)
+    {
+        if (!isRunning)
+            return;
+
+        if (ToEatContainsPair(cellA, cellB))
+        {
+            return;
+        }
+        else
+        {
+            cellsToEat.Add(new KeyValuePair<long, long>(cellA, cellB));
+        }
+
+        PickAndEat();
+    }
+
+    private void PickAndEat()
+    {
+        if (isEating == false && cellsToEat.Count > 0)
+        {
+            isEating = true;
+            currentlyEating = cellsToEat[0];
+
+            Dictionary<string, string> payload = new Dictionary<string, string>();
+            payload.Add("player_cell_id", currentlyEating.Key.ToString());
+            payload.Add("cell_id", currentlyEating.Value.ToString());
+            payload.Add("room_id", model.RoomId.ToString());
+
+            SyncanoWrapper.Please().CallScriptEndpoint(Constants.ENDPOINT_TRY_EAT_CELL_ID, Constants.ENDPOINT_TRY_EAT_CELL, OnTryEatCellFinished, payload);
+        }
+    }
+
+    private void OnTryEatCellFinished(ScriptEndpoint response)
+    {
+        cellsToEat.Remove(currentlyEating);
+        isEating = false;
+    }
+
+    private bool ToEatContainsPair(long cellA, long cellB)
+    {
+        foreach (var item in cellsToEat)
+        {
+            if ((item.Key == cellA && item.Value == cellB) || (item.Key == cellB && item.Value == cellA))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
 }

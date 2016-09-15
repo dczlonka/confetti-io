@@ -7,7 +7,7 @@ public class GameController : Singleton<GameController>
     public GameView GameView { get; private set; }
     public GameModel GameModel { get; private set; }
     public bool IsRunning { get; private set; }
-    private Communication communication;
+    public Communication Communication { get; private set; }
 
     public void StartGame(long roomId)
     {
@@ -27,8 +27,8 @@ public class GameController : Singleton<GameController>
             GameModel = new GameModel(roomId);
             GameView = GetComponent<GameView>();
 
-            communication = new Communication(this);
-            communication.StartSyncLoop(GameModel);
+            Communication = new Communication(this);
+            Communication.StartSyncLoop(GameModel);
         }
     }
 
@@ -44,7 +44,7 @@ public class GameController : Singleton<GameController>
     {
         if (IsRunning)
         {
-            communication.StopSyncLoop();
+            Communication.StopSyncLoop();
         }
         else
         {

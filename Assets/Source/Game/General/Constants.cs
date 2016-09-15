@@ -13,4 +13,7 @@ public class Constants
 
     public const string ENDPOINT_START_GAME = "start_game";
     public const string ENDPOINT_START_GAME_ID = "de9977a70f5bea1afb4538aeb971b10675c00903";
+
+    public const string ENDPOINT_TRY_EAT_CELL = "try_to_eat_cell";
+    public const string ENDPOINT_TRY_EAT_CELL_ID = "37668782253c0b1d19823130903e896b8fa88626";
 }
