@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
 using System.Collections;
 using Syncano.Data;
 
@@ -6,6 +7,9 @@ public class CellView : EntityView
 {
     public const float MAX_SPEED = 2.5f;
     public const float ACCELERATION = 5f;
+
+    [SerializeField]
+    private Text nicknameLabel;
 
     private CellData CellData { get { return Data as CellData; } }
     private Rigidbody2D rigid;
@@ -28,6 +32,8 @@ public class CellView : EntityView
     {
         if (CellData != null)
         {
+            nicknameLabel.text = "id: " + CellData.id.ToString() + "\nsize: " + CellData.size.ToString();
+
             if (IsMyCell(CellData))
             {
                 if (GameInput.Axis != Vector3.zero)
