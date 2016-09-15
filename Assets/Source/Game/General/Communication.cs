@@ -106,6 +106,25 @@ public class Communication
         GetCells(); // Try update again.
     }
 
+    //--------------------------- Get players ---------------------------//
+
+    public void GetPlayers()
+    {
+        Dictionary<string, string> payload = new Dictionary<string, string>();
+        payload.Add("room_id", model.RoomId.ToString());
+        SyncanoWrapper.Please().CallScriptEndpoint(Constants.ENDPOINT_GET_ALL_PLAYERS_ID, Constants.ENDPOINT_GET_ALL_PLAYERS, OnPlayersDownloaded, payload);
+    }
+
+    private void OnPlayersDownloaded(ScriptEndpoint response)
+    {
+        if (!isRunning)
+            return;
+
+        if (response.IsSuccess)
+            Debug.Log(response.stdout);
+            //controller.UpdateCells(response.Objects);
+    }
+
     //--------------------------- Player heartbeat ---------------------------//
 
     private void OnPlayerSaved(Response<PlayerData> response)

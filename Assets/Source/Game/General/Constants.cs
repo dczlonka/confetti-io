@@ -19,4 +19,7 @@ public class Constants
 
     public const string ENDPOINT_TRY_EAT_FOOD = "try_to_eat_food";
     public const string ENDPOINT_TRY_EAT_FOOD_ID = "d58022e61364097759bb598cff1608473a31934e";
+
+    public const string ENDPOINT_GET_ALL_PLAYERS = "get_all_players_in_room";
+    public const string ENDPOINT_GET_ALL_PLAYERS_ID = "7a99f13afd3f7a1d0083c32adf1386e49b0ca26c";
 }
