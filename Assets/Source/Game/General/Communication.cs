@@ -164,8 +164,8 @@ public class Communication
     //--------------------------- Eat cell ---------------------------//
 
     private List<KeyValuePair<long, long>> cellsToEat = new List<KeyValuePair<long, long>>();
-    private KeyValuePair<long, long> currentlyEating;
-    private bool isEating;
+    private KeyValuePair<long, long> currentlyEatenCell;
+    private bool isEatingCell;
 
     public void TryEatCell(long cellA, long cellB)
     {
@@ -181,19 +181,19 @@ public class Communication
             cellsToEat.Add(new KeyValuePair<long, long>(cellA, cellB));
         }
 
-        PickAndEat();
+        PickCellAndEat();
     }
 
-    private void PickAndEat()
+    private void PickCellAndEat()
     {
-        if (isEating == false && cellsToEat.Count > 0)
+        if (isEatingCell == false && cellsToEat.Count > 0)
         {
-            isEating = true;
-            currentlyEating = cellsToEat[0];
+            isEatingCell = true;
+            currentlyEatenCell = cellsToEat[0];
 
             Dictionary<string, string> payload = new Dictionary<string, string>();
-            payload.Add("player_cell_id", currentlyEating.Key.ToString());
-            payload.Add("cell_id", currentlyEating.Value.ToString());
+            payload.Add("player_cell_id", currentlyEatenCell.Key.ToString());
+            payload.Add("cell_id", currentlyEatenCell.Value.ToString());
             payload.Add("room_id", model.RoomId.ToString());
 
             SyncanoWrapper.Please().CallScriptEndpoint(Constants.ENDPOINT_TRY_EAT_CELL_ID, Constants.ENDPOINT_TRY_EAT_CELL, OnTryEatCellFinished, payload);
@@ -202,9 +202,9 @@ public class Communication
 
     private void OnTryEatCellFinished(ScriptEndpoint response)
     {
-        cellsToEat.Remove(currentlyEating);
-        isEating = false;
-        PickAndEat();
+        cellsToEat.Remove(currentlyEatenCell);
+        isEatingCell = false;
+        PickCellAndEat();
     }
 
     private bool CellsToEatContainsPair(long cellA, long cellB)
@@ -223,7 +223,7 @@ public class Communication
     //--------------------------- Eat food ---------------------------//
 
     private List<KeyValuePair<long, long>> foodToEat = new List<KeyValuePair<long, long>>();
-    private KeyValuePair<long, long> currentlyEatingFood;
+    private KeyValuePair<long, long> currentlyEatenFood;
     private bool isEatingFood;
 
     public void TryEatFood(long cellId, long foodId)
@@ -248,11 +248,11 @@ public class Communication
         if (isEatingFood == false && foodToEat.Count > 0)
         {
             isEatingFood = true;
-            currentlyEatingFood = foodToEat[0];
+            currentlyEatenFood = foodToEat[0];
 
             Dictionary<string, string> payload = new Dictionary<string, string>();
-            payload.Add("cell_id", currentlyEating.Key.ToString());
-            payload.Add("food_id", currentlyEating.Value.ToString());
+            payload.Add("cell_id", currentlyEatenFood.Key.ToString());
+            payload.Add("food_id", currentlyEatenFood.Value.ToString());
             payload.Add("room_id", model.RoomId.ToString());
 
             SyncanoWrapper.Please().CallScriptEndpoint(Constants.ENDPOINT_TRY_EAT_FOOD_ID, Constants.ENDPOINT_TRY_EAT_FOOD, OnTryEatFoodFinished, payload);
@@ -261,7 +261,7 @@ public class Communication
 
     private void OnTryEatFoodFinished(ScriptEndpoint response)
     {
-        foodToEat.Remove(currentlyEatingFood);
+        foodToEat.Remove(currentlyEatenFood);
         isEatingFood = false;
         PickFoodAndEat();
     }
